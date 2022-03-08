@@ -8,6 +8,10 @@
 		<button id=connect>Connect</button>
 		<button id=ping>Ping</button>
 		<br>
+		<input id=auth placeholder='Password'>
+		<input id=data placeholder='Packet Content'>
+		<button id=packet>Send Packet</button>
+		<br>
 		<ul id=log style=font-family:monospace; lsn nobg></ul>
         <script src=/libraries/jquery.js></script>
 		<script src=/libraries/socket.max.js></script>
@@ -33,12 +37,20 @@
 		    });
 		    $('#ping').click(e => {
 		       if(socket.connected){
-		           log('Sent: ping');
+		           log('Pinged server');
 		           socket.emit('ping');
 		       }else{
-		           log('Can\'t send packet: socket not connected');
+		           log('Can\'t send ping: socket not connected');
 		       }
 		    });
+		    $('#packet').click(e => {
+		        if(socket.connected){
+		            log('Sent packet');
+		            socket.emit('packet',{auth:$('#auth').val(),content:$('#data').val()});
+		        }else{
+		            log('Can\'t send packet: socket not connected');
+		        }
+		    })
 		</script>
 	</body>
 </html>

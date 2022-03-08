@@ -2,7 +2,7 @@ const app = require('express')(),
 server = require('http').createServer(app),
 io = new (require('socket.io').Server)(server);
 
-let packets = 0, pings = 0, sent = 0, log = [];
+let packets = 0, pings = 0, sent = 0, log = [], clients = {};
 app
 .get('/libraries/jquery.js', (req, res) => {res.sendFile('./libraries/jquery.js')})
 .get('/libraries/socketio.js', (req, res) => {res.sendFile('./libraries/socketio.js')})
@@ -13,6 +13,7 @@ app
 
 io.on('connection', socket => {
     socket.emit('packet','client connected');
+    clients[socket.id] = Object.assign(socket,{username:'dummy',uuid:'-1',oplvl:'-1'});
     sent++;
     log.push('client connected with id '+socket.id);
 	socket.on('ping', data => {
@@ -22,9 +23,21 @@ io.on('connection', socket => {
 	    sent++;
 	});
 	socket.on('packet', data => {
-	    log.push('recieved: packet')
+	    log.push('recieved: packet');
 	    packets++;
-	    socket.emit('packet', 'NOT IMPLEMENTED');
+	    if(data.auth == 'test-password' && data.content){
+	        switch(data.content){
+	            case 'get-clients':
+	                let res = {};
+	                for(let id in clients){
+	                    res[id] = {socket:id,username:clients[id].username,id:clients[id].uuid};
+	                }
+	                socket.emit('packet',res)
+	                break;
+	        }
+	    }else{
+	        socket.emit('packet', 'Not Authorized');
+	    }
 	    sent++;
 	});
 });
