@@ -5,30 +5,38 @@
 		<link rel=stylesheet href=https://a.drvortex.dev/libraries/styles.css>
 	</head>
 	<body>
-	    <input id=host placeholder='Host Name (e.g. annihilation.vercel.app:3000)'>
 		<button id=connect>Connect</button>
-		<button id=packet>Send Packet</button>
+		<button id=ping>Ping</button>
 		<br>
-		<ul id=log style=font-family:monospace lsn nobg></ul>
+		<ul id=log style=font-family:monospace; lsn nobg></ul>
         <script src=/libraries/jquery.js></script>
-		<script src=/libraries/socketio.js></script>
+		<script src=/libraries/socket.max.js></script>
 		<script>
+		    Object.prototype.toString = function(){return JSON.stringify(this)}
 		    const log = data => $('<li></li>').text(data).appendTo('#log');
 		    let socket;
 		    $('#connect').click(e => {
-		        socket = io('ws://'+$('#host').val());
-		        socket.on('connection', s => {
-		            log('connected to server');
+		        log('Attempting to connect')
+		        socket = io('mp.annihilation.drvortex.dev', { reconnection: false });
+		        socket.on('connect' , s => {
+		            log('Connected to server as ' + socket.id);
 		        });
-		        socket.on('packet', s => {
-		           log('response packet recieved from server');
+		        socket.on('connect_error', err => {
+		            log('Connection error: ' + err);
+		        });
+		        socket.on('connect_failed', err => {
+		            log('Connection failed: ' + err);
+		        });
+		        socket.on('packet', packet => {
+		           log('Response packet recieved: ' + packet);
 		        });
 		    });
-		    $('#packet').click(e => {
+		    $('#ping').click(e => {
 		       if(socket.connected){
-		           socket.emit('packet');
+		           log('Sent: ping');
+		           socket.emit('ping');
 		       }else{
-		           log('Cannot send packet: socket not connected');
+		           log('Can\'t send packet: socket not connected');
 		       }
 		    });
 		</script>
