@@ -1,8 +1,21 @@
 {
   "name": "annihilation-multiplayer",
-  "version": "prototype-1",
+  "version": "1.0.0",
+  "description": "Multiplayer for Annihilation",
   "main": "server.js",
-  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dr-vortex/annihilation-multiplayer.git"
+  },
+  "author": "Dr. Vortex",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dr-vortex/annihilation-multiplayer/issues"
+  },
+  "homepage": "https://github.com/dr-vortex/annihilation-multiplayer#readme",
   "dependencies": {
     "socket.io": "^4.4.1"
   }
