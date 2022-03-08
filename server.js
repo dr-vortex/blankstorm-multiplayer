@@ -9,7 +9,8 @@ app
 })
 .get('/libraries/jquery.js', (req, res) => {res.sendFile('./libraries/jquery.js')})
 .get('/libraries/socketio.js', (req, res) => {res.sendFile('./libraries/socketio.js')})
-.get('/',(req,res) => {res.sendFile('./index.html')});
+.get('/',(req,res) => {res.sendFile('./index.html')})
+.get('/ping',(req,res) => {res.send('Server is online.')});
 
 io.on('connection', socket => {
     socket.emit('packet','client connected');
