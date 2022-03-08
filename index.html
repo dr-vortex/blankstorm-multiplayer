@@ -5,6 +5,7 @@
 		<link rel=stylesheet href=https://a.drvortex.dev/libraries/styles.css>
 	</head>
 	<body>
+	    <input id=host placeholder='Host Name (e.g. annihilation.vercel.app:3000)'>
 		<button id=connect>Connect</button>
 		<button id=packet>Send Packet</button>
 		<br>
@@ -15,7 +16,7 @@
 		    const log = data => $('<li></li>').text(data).appendTo('#log');
 		    let socket;
 		    $('#connect').click(e => {
-		        socket = io('ws://'+location.host+':3000');
+		        socket = io('ws://'+$('#host').val());
 		        socket.on('connection', s => {
 		            log('connected to server');
 		        });
