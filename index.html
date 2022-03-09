@@ -8,8 +8,8 @@
 		<button id=connect>Connect</button>
 		<button id=ping>Ping</button>
 		<br>
-		<input id=auth placeholder='Password'>
-		<input id=data placeholder='Packet Content'>
+		<input id=type placeholder='Packet Type'>
+		<input id=data placeholder='Data'>
 		<button id=packet>Send Packet</button>
 		<br>
 		<ul id=log style=font-family:monospace; lsn nobg></ul>
@@ -46,7 +46,7 @@
 		    $('#packet').click(e => {
 		        if(socket.connected){
 		            log('Sent packet');
-		            socket.emit('packet',{auth:$('#auth').val(),content:$('#data').val()});
+		            socket.emit('packet',$('#type').val(),$('#data').val());
 		        }else{
 		            log('Can\'t send packet: socket not connected');
 		        }

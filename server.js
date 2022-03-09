@@ -1,6 +1,19 @@
 const app = require('express')(),
 server = require('http').createServer(app),
-io = new (require('socket.io').Server)(server);
+io = new (require('socket.io').Server)(server),
+https = require('https');
+
+const get = (url, callback) => {
+    https.get(url, res => {
+        let body = '';
+        res.on('data', data => {
+            body += data;
+        });
+        res.on('end', e => {
+           callback(body); 
+        });
+    });
+};
 
 let packets = 0, pings = 0, sent = 0, log = [], clients = {};
 app
@@ -17,26 +30,34 @@ io.on('connection', socket => {
     sent++;
     log.push('client connected with id '+socket.id);
 	socket.on('ping', data => {
-	    log.push('recieved: ping');
+	    log.push('recieved ping');
 	    pings++;
 	    socket.emit('packet', {clients: io.engine.clientsCount, status: 'online'});
 	    sent++;
 	});
-	socket.on('packet', data => {
-	    log.push('recieved: packet');
+	socket.on('packet', (type, data) => {
+	    log.push('recieved packet: '+type);
 	    packets++;
-	    if(data.auth == 'test-password' && data.content){
-	        switch(data.content){
-	            case 'get-clients':
+	    switch(type){
+	        case 'get-clients':
+	            if(data == 'test-password'){
 	                let res = {};
 	                for(let id in clients){
 	                    res[id] = {socket:id,username:clients[id].username,id:clients[id].uuid};
 	                }
-	                socket.emit('packet',res)
+	                socket.emit('packet', res);
 	                break;
-	        }
-	    }else{
-	        socket.emit('packet', 'Not Authorized');
+	            }else{
+	                socket.emit('packet', 'Not Authorized');
+	            }
+                break;
+            case 'auth':
+                get('https://annihilation.drvortex.dev/api/user?token='+data, res => {
+                    socket.emit('packet',res=='ERROR 404'?'authorization failed':'client authorized');
+                });
+                break;
+            default:
+                socket.emit('packet',`"${type}" packet not accepted`);
 	    }
 	    sent++;
 	});
