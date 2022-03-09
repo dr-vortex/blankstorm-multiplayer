@@ -1,56 +1,56 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	    <title>Annihilation Socket Test</title>
+		<title>Annihilation Socket Test</title>
 		<link rel=stylesheet href=https://a.drvortex.dev/libraries/styles.css>
 	</head>
 	<body>
 		<button id=connect>Connect</button>
 		<button id=ping>Ping</button>
 		<br>
-		<input id=type placeholder='Packet Type'>
-		<input id=data placeholder='Data'>
+		<input id=type placeholder='Packet Type' style=height:1.5em>
+		<input id=data placeholder='Data' style=min-width:350px;height:1.5em>
 		<button id=packet>Send Packet</button>
 		<br>
 		<ul id=log style=font-family:monospace; lsn nobg></ul>
-        <script src=/libraries/jquery.js></script>
+		<script src=/libraries/jquery.js></script>
 		<script src=/libraries/socket.max.js></script>
 		<script>
-		    Object.prototype.toString = function(){return JSON.stringify(this)}
-		    const log = data => $('<li></li>').text(data).appendTo('#log');
-		    let socket;
-		    $('#connect').click(e => {
-		        log('Attempting to connect')
-		        socket = io('mp.annihilation.drvortex.dev', { reconnection: false });
-		        socket.on('connect' , s => {
-		            log('Connected to server as ' + socket.id);
-		        });
-		        socket.on('connect_error', err => {
-		            log('Connection error: ' + err);
-		        });
-		        socket.on('connect_failed', err => {
-		            log('Connection failed: ' + err);
-		        });
-		        socket.on('packet', packet => {
-		           log('Response packet recieved: ' + packet);
-		        });
-		    });
-		    $('#ping').click(e => {
-		       if(socket.connected){
-		           log('Pinged server');
-		           socket.emit('ping');
-		       }else{
-		           log('Can\'t send ping: socket not connected');
-		       }
-		    });
-		    $('#packet').click(e => {
-		        if(socket.connected){
-		            log('Sent packet');
-		            socket.emit('packet',$('#type').val(),$('#data').val());
-		        }else{
-		            log('Can\'t send packet: socket not connected');
-		        }
-		    })
+			Object.prototype.toString = Array.prototype.toString = function(){return JSON.stringify(this)}
+			const log = data => $('<li></li>').html(data).appendTo('#log');
+			let socket;
+			$('#connect').click(e => {
+				log('Attempting to connect')
+				socket = io('mp.annihilation.drvortex.dev', { reconnection: false });
+				socket.on('connect' , s => {
+					log('Connected to server as ' + socket.id);
+				});
+				socket.on('connect_error', err => {
+					log('Connection error: ' + err);
+				});
+				socket.on('connect_failed', err => {
+					log('Connection failed: ' + err);
+				});
+				socket.on('packet', packet => {
+				    log('Response: ' + (packet instanceof Array ? `Array (${packet.length})<br>` + packet.join('<br>') : packet));
+				});
+			});
+			$('#ping').click(e => {
+				if(socket.connected){
+					log('Pinged server');
+					socket.emit('ping');
+				}else{
+					log('Can\'t send ping: socket not connected');
+				}
+			});
+			$('#packet').click(e => {
+				if(socket.connected){
+					log('Sent packet: '+$('#type').val());
+					socket.emit('packet',$('#type').val(),$('#data').val());
+				}else{
+					log('Can\'t send packet: socket not connected');
+				}
+			})
 		</script>
 	</body>
 </html>
