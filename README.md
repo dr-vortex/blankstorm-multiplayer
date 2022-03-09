@@ -9,7 +9,7 @@ You can test the app [here](https://a.drvortex.dev/mp). You will have to connect
 - get-clients: get the other connected clients. Requires authoization.
 - get-log: get the server logs. Requires authorization and being a website moderator or above (a client in get-clients with an oplvl greater than 0)
 
-At some point the server code may not be posted to this repo if and sensitive data (like database passwords) are added. Also note that the `get-clients` response does not include real user data, except for the socket ID.
+At some point the server code may not be posted to this repo if and sensitive data (like database passwords) are added.
 
 [Testing](https://a.drvortex.dev/mp)
 
