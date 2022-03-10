@@ -12,9 +12,10 @@
 		<input id=data placeholder='Data' style=min-width:350px;height:1.5em>
 		<button id=packet>Send Packet</button>
 		<br>
-		<ul id=log style=font-family:monospace; lsn nobg></ul>
+		<ul id=log style=font-family:monospace;max-width:50% lsn nobg></ul>
 		<script src=/libraries/jquery.js></script>
 		<script src=/libraries/socket.max.js></script>
+		
 		<script>
 			Object.prototype.toString = Array.prototype.toString = function(){return JSON.stringify(this)}
 			const log = data => $('<li></li>').html(data).appendTo('#log');
@@ -32,25 +33,29 @@
 					log('Connection failed: ' + err);
 				});
 				socket.on('packet', packet => {
-				    log('Response: ' + (packet instanceof Array ? `Array (${packet.length})<br>` + packet.join('<br>') : packet));
+				    log('[Server] ' + (packet instanceof Array ? `Array (${packet.length})<br>` + packet.join('<br>') : packet));
+				});
+				socket.on('chat', message => {
+				   log(`[Chat] ${message.user}: ${message.content}`);
 				});
 			});
 			$('#ping').click(e => {
 				if(socket.connected){
-					log('Pinged server');
 					socket.emit('ping');
 				}else{
 					log('Can\'t send ping: socket not connected');
 				}
 			});
 			$('#packet').click(e => {
-				if(socket.connected){
-					log('Sent packet: '+$('#type').val());
-					socket.emit('packet',$('#type').val(),$('#data').val());
-				}else{
-					log('Can\'t send packet: socket not connected');
-				}
-			})
+				socket.connected ? socket.emit('packet',$('#type').val(),$('#data').val())
+				: log(`Can't send ${$('#type').val()} packet: socket not connected`);
+				$('#data').val('')
+			});
+			$('#data,#type').keypress(e => {
+			    if(e.key == 'Enter'){
+			        $('#packet').click();
+			    }
+			});
 		</script>
 	</body>
 </html>
