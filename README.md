@@ -10,7 +10,7 @@ You can test the app [here](https://a.drvortex.dev/mp). You will have to connect
 - get-log: get the server logs. Requires authorization and being a website moderator or above (a client in get-clients with an oplvl greater than 0)
 - chat: sends a chat message. All other clients will recieve this!
 
-At some point the server code may not be posted to this repo if and sensitive data (like database passwords) are added.
+At some point some of the server code may not be posted to this repo if it includes sensitive data (like database passwords).
 
 [Testing](https://a.drvortex.dev/mp)
 
