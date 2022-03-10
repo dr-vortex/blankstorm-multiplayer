@@ -20,7 +20,6 @@ let log = [], chat = [], clients = {};
 app
 .get('/libraries/jquery.js', (req, res) => {res.sendFile('./libraries/jquery.js')})
 .get('/libraries/socketio.js', (req, res) => {res.sendFile('./libraries/socketio.js')})
-.get('/libraries/socket.max.js', (req, res) => {res.sendFile('./libraries/socket.max.js')})
 .get('/',(req,res) => {res.sendFile('./index.html')});
 
 io.on('connection', socket => {
