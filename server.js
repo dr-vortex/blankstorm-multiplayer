@@ -87,7 +87,8 @@ io.on('connection', socket => {
 		socket.emit('packet', {currentPlayers: io.sockets.sockets.size, maxPlayers: config.max_players, status: 'online', message: config.message});
 	});
 	socket.on('disconnect', reason => {
-	   log(socket.user.username + ' disconnected: ' + reason); 
+	   log(socket.user.username + ' disconnected: ' + reason);
+	   delete players[socket.id];
 	});
 	socket.on('packet', (type, data) => {
 		log('recieved packet: '+type);
