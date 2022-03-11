@@ -17,8 +17,9 @@
   },
   "homepage": "https://github.com/dr-vortex/annihilation-multiplayer#readme",
   "dependencies": {
-    "express": "^4.17.3",
+    "babylonjs": "^4.2.1",
     "https": "^1.0.0",
-    "socket.io": "^4.4.1"
+    "socket.io": "^4.4.1",
+    "xhr2": "^0.2.1"
   }
 }
