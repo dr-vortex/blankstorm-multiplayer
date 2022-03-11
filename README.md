@@ -5,9 +5,8 @@ This is a repository made for the development and testing of multiplayer for [An
 ## Testing
 
 You can test the app [here](https://a.drvortex.dev/mp). You will have to connect before you send a ping or packet. Ping the server to see the amount of clients and the server status (always `online`). Some packets you can send:
-- auth (data is your token): request authorization. Must be a valid token (if your logged in: click the lock in the top left -> cookies -> annihiltion.drvortex.dev -> token -> double click value -> copy + paste)
-- get-clients: get the other connected clients. Requires authoization.
-- get-log: get the server logs. Requires authorization and being a website moderator or above (a client in get-clients with an oplvl greater than 0)
+- get-clients: get the other connected clients.
+- get-log: get the server logs. Server ops only!
 - chat: sends a chat message. All other clients will recieve this!
 
 At some point some of the server code may not be posted to this repo if it includes sensitive data (like database passwords).
