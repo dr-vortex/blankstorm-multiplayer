@@ -1,7 +1,8 @@
 //modules
-const server = require('http').createServer(),
-io = new (require('socket.io').Server)(server, { cors : {origin: 'https://annihilation.drvortex.dev'}}),
-https = require('https');
+const
+https = require('https'), fs = require('fs'), ini = require('ini'),
+server = require('http').createServer(),
+io = new (require('socket.io').Server)(server, { cors : {origin: 'https://annihilation.drvortex.dev'}});
 //BABYLON = require('babylonjs');
 //global.XMLHttpRequest = require('xhr2').XMLHttpRequest;
 //Object.assign(global, BABYLON);
@@ -26,11 +27,37 @@ isJSON = str => {
 	}catch(err){
 		return false;
 	}
+},
+log = message => {
+    logs.push(message);
+    console.log(message);
 };
-
 //global variables
 
-const log = [], chat = [], players = {};
+const logs = [], chat = [], players = {};
+let ops = {}, whitelist = [], blacklist = [];
+
+//load config and settings and things
+
+const config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'));
+let opsString = fs.readFileSync('./ops.json','utf-8');
+if(isJSON(opsString)){ops = JSON.parse(opsString)}
+if(config.whitelist){
+    let whitelistString = fs.readFileSync('./whitelist.json', 'utf-8');
+    if(isJSON(whitelistString)){
+        whitelist = JSON.parse(whitelistString);
+    }else{
+        log('Error reading whitelist: not JSON');
+    }
+}
+if(config.blacklist){
+    let blacklistString = fs.readFileSync('./blacklist.json', 'utf-8');
+    if(isJSON(blacklistString)){
+        blacklist = JSON.parse(blacklistString);
+    }else{
+        log('Error reading blacklist: not JSON');
+    }
+}
 
 //Babylon stuff
 //const engine = new NullEngine();
@@ -40,7 +67,7 @@ io.use((socket, next) => {
 	get('https://annihilation.drvortex.dev/api/user?token=' + socket.handshake.auth.token, res => {
 		if(isJSON(res) && !res.includes('ERROR') && res != 'null'){
 			user = JSON.parse(res);
-			log.push(`${user.username} (${user.id}) connected with id ${socket.id}`);
+			log(`${user.username} (${user.id}) connected with id ${socket.id}`);
 			players[socket.id] = socket.user = {socket: socket, id: user.id, username: user.username, oplvl: parseFloat(user.oplvl)};
 			next();
 		}else{
@@ -48,13 +75,22 @@ io.use((socket, next) => {
 		}
 	});
 });
+io.use((socket, next) => {
+    if(io.sockets.sockets.size >= config.max_players && (ops[socket.user.id] && !ops[socket.user.id].bypassLimit)){
+        next(new Error('Connection refused: server full'));
+    }
+    next();
+});
 io.on('connection', socket => {
 	socket.on('ping', data => {
-		log.push('recieved ping');
-		socket.emit('packet', {clients: io.engine.clientsCount, status: 'online'});
+		log('recieved ping');
+		socket.emit('packet', {currentPlayers: io.sockets.sockets.size, maxPlayers: config.max_players, status: 'online', message: config.message});
+	});
+	socket.on('disconnect', reason => {
+	   log(socket.user.username + ' disconnected: ' + reason); 
 	});
 	socket.on('packet', (type, data) => {
-		log.push('recieved packet: '+type);
+		log('recieved packet: '+type);
 		switch(type){
 			case 'get-clients':
 				let res = [];
@@ -69,14 +105,14 @@ io.on('connection', socket => {
 				socket.emit('packet', res);
 				break;
 			case 'get-log':
-				if(socket.user.oplvl > 0){
-					socket.emit('packet', log);
+				if(ops[socket.user.id] && ops[socket.user.id].level > 0){
+					socket.emit('packet', logs);
 				}else{
 					socket.emit('packet', 'Forbidden');
 				}
 				break;
 			case 'chat':
-				log.push(`[Chat] ${socket.user.username}: ${data}`);
+				log(`[Chat] ${socket.user.username}: ${data}`);
 				io.emit('chat',{user: socket.user.username,  content: data});
 				break;
 			default:
@@ -84,4 +120,4 @@ io.on('connection', socket => {
 		}
 	});
 });
-server.listen(80, e => log.push('server started'));
+server.listen(80, e => log('server started'));

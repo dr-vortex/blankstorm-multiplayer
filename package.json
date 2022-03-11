@@ -19,6 +19,7 @@
   "dependencies": {
     "babylonjs": "^4.2.1",
     "https": "^1.0.0",
+    "ini": "^2.0.0",
     "socket.io": "^4.4.1",
     "xhr2": "^0.2.1"
   }
