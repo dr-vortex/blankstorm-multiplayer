@@ -1,7 +1,13 @@
 //modules
 const
 https = require('https'), fs = require('fs'), ini = require('ini'),
-server = require('http').createServer(),
+server = require('http').createServer((req, res) => {
+    if(req.url == '/ping'){
+        log('recieved ping');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.end(JSON.stringify({currentPlayers: io.sockets.sockets.size, maxPlayers: config.max_players, status: 'online', message: config.message}));
+    }
+}),
 io = new (require('socket.io').Server)(server, { cors : {origin: 'https://annihilation.drvortex.dev'}});
 //BABYLON = require('babylonjs');
 //global.XMLHttpRequest = require('xhr2').XMLHttpRequest;
@@ -82,10 +88,6 @@ io.use((socket, next) => {
     next();
 });
 io.on('connection', socket => {
-	socket.on('ping', data => {
-		log('recieved ping');
-		socket.emit('packet', {currentPlayers: io.sockets.sockets.size, maxPlayers: config.max_players, status: 'online', message: config.message});
-	});
 	socket.on('disconnect', reason => {
 	   log(socket.user.username + ' disconnected: ' + reason);
 	   delete players[socket.id];
