@@ -154,7 +154,7 @@ io.on('connection', socket => {
 		log(`[Chat] ${player.username}: ${data}`);
 		io.emit('chat', `${player.username}: ${data}`);
 	});
-	socket.in('/ops').on('get-log', () => {
+	io.of('/ops').on('get-log', () => {
 		socket.emit('packet', logs);
 	});
 	io.of('/ops').on('connection', socket => {
