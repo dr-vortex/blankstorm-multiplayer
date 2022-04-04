@@ -93,31 +93,32 @@ const blacklist = fs.existsSync('./blacklist.json') && config.blacklist ? JSON.p
 
 //Socket handling
 io.use((socket, next) => {
-	let res = await get('https://annihilation.drvortex.dev/api/user?token=' + socket.handshake.auth.token);
-	if(isJSON(res) && !res.includes('ERROR') && res != 'null'){
+	get('https://annihilation.drvortex.dev/api/user?token=' + socket.handshake.auth.token).then(res => {
+		if(isJSON(res) && !res.includes('ERROR') && res != 'null'){
 		
-		let user = JSON.parse(res);
-
-		if(config.whitelist && !whitelist.includes(user.id)){
-			next(new Error('Connection refused: you are not whitelisted'));
-		}else if(config.blacklist && blacklist.includes(user.id)){
-			next(new Error('Connection refused: you are banned from this server'));
-		}else if(+user.disabled){
-			next(new Error('Connection refused: your account is disabled'));
-		}else if(io.sockets.sockets.size >= config.max_players && !(ops[user.id] && ops[user.id].bypassLimit)){
-			next(new Error('Connection refused: server full'));
-		}else{
-			let player = new Player(user, socket);
-			log(`${user.username} connected with socket id ${socket.id}`);
-			io.emit('chat', `${user.username} joined`);
-			if(player.op > 0){
-				socket.join('/ops');
+			let user = JSON.parse(res);
+	
+			if(config.whitelist && !whitelist.includes(user.id)){
+				next(new Error('Connection refused: you are not whitelisted'));
+			}else if(config.blacklist && blacklist.includes(user.id)){
+				next(new Error('Connection refused: you are banned from this server'));
+			}else if(+user.disabled){
+				next(new Error('Connection refused: your account is disabled'));
+			}else if(io.sockets.sockets.size >= config.max_players && !(ops[user.id] && ops[user.id].bypassLimit)){
+				next(new Error('Connection refused: server full'));
+			}else{
+				let player = new Player(user, socket);
+				log(`${user.username} connected with socket id ${socket.id}`);
+				io.emit('chat', `${user.username} joined`);
+				if(player.op > 0){
+					socket.join('/ops');
+				}
+				next();
 			}
-			next();
+		}else{
+			next(new Error('Connection refused: invalid token'));
 		}
-	}else{
-		next(new Error('Connection refused: invalid token'));
-	}
+	});
 });
 io.on('connection', socket => {
 	let player = players.get(socket.id);
