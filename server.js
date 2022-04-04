@@ -29,14 +29,14 @@ io = new (require('socket.io').Server)(server, { cors : {origin: 'https://annihi
 
 //global functions
 
-const get = url => new Promise(res => {
+const get = url => new Promise(resolve => {
 	https.get(url, res => {
 		let body = '';
 		res.on('data', data => {
 			body += data;
 		});
 		res.on('end', e => {
-			res(body); 
+			resolve(body); 
 		});
 	});
 }),
