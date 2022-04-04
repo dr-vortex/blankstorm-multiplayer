@@ -111,7 +111,7 @@ io.use((socket, next) => {
 				log(`${user.username} connected with socket id ${socket.id}`);
 				io.emit('chat', `${user.username} joined`);
 				if(player.op > 0){
-					socket.join('/ops');
+					socket.join('ops');
 					log(`Connected ${player.username} to /ops`);
 				}
 				next();
@@ -153,9 +153,6 @@ io.on('connection', socket => {
 	socket.on('chat', data => {
 		log(`[Chat] ${player.username}: ${data}`);
 		io.emit('chat', `${player.username}: ${data}`);
-	});
-	io.of('/ops').on('get-log', () => {
-		socket.emit('packet', logs);
 	});
 	io.of('/ops').on('connection', socket => {
 		let player = players.get(socket.id);
