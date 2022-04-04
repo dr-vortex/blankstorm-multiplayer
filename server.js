@@ -112,6 +112,7 @@ io.use((socket, next) => {
 				io.emit('chat', `${user.username} joined`);
 				if(player.op > 0){
 					socket.join('/ops');
+					log(`Connected ${player.username} to /ops`);
 				}
 				next();
 			}
@@ -141,19 +142,6 @@ io.on('connection', socket => {
 			});
 		});
 		socket.emit('packet', res);
-	});
-	socket.on('get-info', data => {
-		socket.emit('packet', {
-			username: player.username,
-			id: player.id,
-			op: player.op,
-			socket: socket.id,
-			rooms: socket.rooms
-		});
-	});
-	socket.on('join', data => {
-		socket.join('/ops');
-		socket.emit(JSON.stringify(socket.rooms))
 	});
 	socket.on('command', cmd => {
 		if(player.op > 0){
