@@ -37,32 +37,73 @@ log = message => {
 	logs.push(message);
 	console.log(message);
 };
+
+const Config = class {
+	constructor(path, format = 'json', assign = true){
+		this._path = path;
+		this._format = format;
+		this._raw = fs.readFileSync(this._path, 'utf-8');
+		this._data = {};
+		switch(this._format){
+			case 'json':
+				if(isJSON(this._raw)){
+					this._data = JSON.parse(this._raw);
+				}else{
+					throw new TypeError(`Config failed parsing ${this._path}: not JSON`);
+				}
+				break;
+			case 'ini':
+				this._data = ini.parse(this._raw);
+				break;
+			default:
+				this._data = raw;
+		}
+		if(assign){
+			Object.assign(this, this._data);
+		}
+	}
+	write(data){
+		fs.writeFileSync(this._path, data, err => {
+			throw `Can't write to config file ${this._path}: ${err}`;
+		});
+	}
+	append(data){
+		fs.appendFileSync(this._path, data, err => {
+			throw `Can't write to config file ${this._path}: ${err}`;
+		});
+	}
+}
+
+const Player = class {
+	constructor(playerInfo, socket){
+		Object.assign(this, {
+			id: playerInfo.id,
+			username: playerInfo.username,
+			socket: socket
+		});
+	}
+	kick(message){
+		this.socket.emit('kick', message);
+		this.socket.disconnect(true);
+	}
+	ban(message){
+		this.kick('you have been banned from this server');
+	}
+	chat(message){
+		io.emit('chat', message);
+	}
+};
+
 //global variables
 
-const logs = [], chat = [], players = {};
-let ops = {}, whitelist = [], blacklist = [];
+const logs = [], chat = [], players = new Map();
 
 //load config and settings and things
 
-const config = ini.parse(fs.readFileSync('./config.ini', 'utf-8'));
-let opsString = fs.readFileSync('./ops.json','utf-8');
-if(isJSON(opsString)){ops = JSON.parse(opsString)}
-if(config.whitelist){
-	let whitelistString = fs.readFileSync('./whitelist.json', 'utf-8');
-	if(isJSON(whitelistString)){
-		whitelist = JSON.parse(whitelistString);
-	}else{
-		log('Error reading whitelist: not JSON');
-	}
-}
-if(config.blacklist){
-	let blacklistString = fs.readFileSync('./blacklist.json', 'utf-8');
-	if(isJSON(blacklistString)){
-		blacklist = JSON.parse(blacklistString);
-	}else{
-		log('Error reading blacklist: not JSON');
-	}
-}
+const config = new Config('./config.ini', 'ini');
+const ops = new Config('./ops.json');
+const whitelist = new Config('./whitelist.json');
+const blacklist = new Config('./blacklist.json');
 
 //Babylon stuff
 //const engine = new NullEngine();
@@ -71,19 +112,26 @@ if(config.blacklist){
 io.use((socket, next) => {
 	get('https://annihilation.drvortex.dev/api/user?token=' + socket.handshake.auth.token, res => {
 		if(isJSON(res) && !res.includes('ERROR') && res != 'null'){
-			user = JSON.parse(res);
-			log(`${user.username} (${user.id}) connected with id ${socket.id}`);
-			players[socket.id] = socket.user = {socket: socket, id: user.id, username: user.username, oplvl: parseFloat(user.oplvl)};
-			if(io.sockets.sockets.size >= config.max_players && (ops[socket.user.id] && !ops[socket.user.id].bypassLimit)){
-				next(new Error('Connection refused: server full'));
-			}
+			let user = JSON.parse(res);
+
 			if(config.whitelist && !whitelist.includes(user.id)){
 				next(new Error('Connection refused: you are not whitelisted'));
-			}
-			if(config.blacklist && blacklist.includes(user.id)){
+			}else if(config.blacklist && blacklist.includes(user.id)){
 				next(new Error('Connection refused: you are banned from this server'));
+			}else if(user.disabled){
+				next(new Error('Connection refused: your account is disabled'));
+			}else if(io.sockets.sockets.size >= config.max_players && !(ops[user.id] && ops[user.id].bypassLimit)){
+				next(new Error('Connection refused: server full'));
+			}else{
+				players.set(socket.id, {
+					socket: socket,
+					id: user.id,
+					username: user.username,
+					oplvl: ops[user.id] ? ops[user.id].level : 0
+				}); 
+				log(`${user.username} connected with socket id ${socket.id}`);
+				next();
 			}
-			next();
 		}else{
 			next(new Error('Connection refused: invalid token'));
 		}
@@ -92,25 +140,25 @@ io.use((socket, next) => {
 io.on('connection', socket => {
 	socket.on('disconnect', reason => {
 		log(socket.user.username + ' disconnected: ' + reason);
-		delete players[socket.id];
+		players.delete(socket.id)
 	});
 	socket.onAny(type => {
 		 log('recieved packet: ' + type);
 	});
 	socket.on('get-clients', data => {
 		let res = [];
-		for(let id in players){
+		players.forEach(player => {
 			res.push({
-				socket: id,
-				id: players[id].id,
-				username: players[id].username,
-				oplvl: players[id].oplvl
+				socket: player.socket.id,
+				id: player.id,
+				username: player.username,
+				oplvl: player.oplvl
 			});
-		}
+		});
 		socket.emit('packet', res);
 	});
 	socket.on('get-log', data => {
-		if(ops[socket.user.id] && ops[socket.user.id].level > 0){
+		if(players.get(socket.id).oplvl > 0){
 			socket.emit('packet', logs);
 		}else{
 			socket.emit('packet', 'Forbidden');
@@ -118,7 +166,7 @@ io.on('connection', socket => {
 	});
 	socket.on('chat', data => {
 		log(`[Chat] ${socket.user.username}: ${data}`);
-		io.emit('chat',{user: socket.user.username, content: data});
+		io.emit('chat', `${socket.user.username}: ${data}`);
 	});
 });
 server.listen(80, e => log('server started'));
