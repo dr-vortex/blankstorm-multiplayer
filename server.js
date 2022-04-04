@@ -165,8 +165,8 @@ io.on('connection', socket => {
 		} 
 	});
 	socket.on('chat', data => {
-		log(`[Chat] ${socket.user.username}: ${data}`);
-		io.emit('chat', `${socket.user.username}: ${data}`);
+		log(`[Chat] ${players.get(socket.id).username}: ${data}`);
+		io.emit('chat', `${players.get(socket.id).username}: ${data}`);
 	});
 });
 server.listen(80, e => log('server started'));
