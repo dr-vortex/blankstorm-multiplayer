@@ -151,8 +151,8 @@ io.on('connection', socket => {
 			rooms: socket.rooms
 		});
 	});
-	socket.on('join', nsp => {
-		socket.join(nsp);
+	socket.on('join', data => {
+		socket.join('/ops');
 		socket.emit(JSON.stringify(socket.rooms))
 	});
 	socket.on('command', cmd => {
