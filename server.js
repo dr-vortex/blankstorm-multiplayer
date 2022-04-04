@@ -118,7 +118,7 @@ io.use((socket, next) => {
 				next(new Error('Connection refused: you are not whitelisted'));
 			}else if(config.blacklist && blacklist.includes(user.id)){
 				next(new Error('Connection refused: you are banned from this server'));
-			}else if(user.disabled){
+			}else if(+user.disabled){
 				next(new Error('Connection refused: your account is disabled'));
 			}else if(io.sockets.sockets.size >= config.max_players && !(ops[user.id] && ops[user.id].bypassLimit)){
 				next(new Error('Connection refused: server full'));
