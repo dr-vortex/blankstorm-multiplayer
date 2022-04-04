@@ -153,6 +153,7 @@ io.on('connection', socket => {
 	});
 	socket.on('join', nsp => {
 		socket.join(nsp);
+		socket.emit(JSON.stringify(socket.rooms))
 	});
 	socket.on('command', cmd => {
 		if(player.op > 0){
