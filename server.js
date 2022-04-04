@@ -154,17 +154,17 @@ io.on('connection', socket => {
 		log(`[Chat] ${player.username}: ${data}`);
 		io.emit('chat', `${player.username}: ${data}`);
 	});
-});
-io.of('/ops').on('connection', socket => {
-	let player = players.get(socket.id);
-
-	socket.onAny(type => log(`Recieved ops packet: ${type}`));
-	socket.on('get-log', () => {
-		socket.emit('packet', logs);
-	});
-	socket.on('kick', (user, reason) => {
-		players.getByName(user).kick(reason);
-		socket.emit('Kicked ' + user);
+	io.of('/ops').on('connection', socket => {
+		let player = players.get(socket.id);
+	
+		socket.onAny(type => log(`Recieved ops packet: ${type}`));
+		socket.on('get-log', () => {
+			socket.emit('packet', logs);
+		});
+		socket.on('kick', (user, reason) => {
+			players.getByName(user).kick(reason);
+			socket.emit('Kicked ' + user);
+		});
 	});
 });
 server.listen(80, e => log('server started'));
