@@ -142,6 +142,15 @@ io.on('connection', socket => {
 		});
 		socket.emit('packet', res);
 	});
+	socket.on('get-info', data => {
+		socket.emit('packet', {
+			username: player.username,
+			id: player.id,
+			op: player.op,
+			socket: socket.id,
+			rooms: socket.rooms
+		});
+	});
 	socket.on('command', cmd => {
 		if(player.op > 0){
 			socket.emit('chat', `not implemented`);
