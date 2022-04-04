@@ -110,10 +110,6 @@ io.use((socket, next) => {
 				let player = new Player(user, socket);
 				log(`${user.username} connected with socket id ${socket.id}`);
 				io.emit('chat', `${user.username} joined`);
-				if(player.op > 0){
-					socket.join('ops');
-					log(`Connected ${player.username} to /ops`);
-				}
 				next();
 			}
 		}else{
@@ -154,10 +150,7 @@ io.on('connection', socket => {
 		log(`[Chat] ${player.username}: ${data}`);
 		io.emit('chat', `${player.username}: ${data}`);
 	});
-	io.of('/ops').on('connection', socket => {
-		let player = players.get(socket.id);
-	
-		socket.onAny(type => log(`Recieved ops packet: ${type}`));
+	if(player.op){
 		socket.on('get-log', () => {
 			socket.emit('packet', logs);
 		});
@@ -165,6 +158,6 @@ io.on('connection', socket => {
 			players.getByName(user).kick(reason);
 			socket.emit('Kicked ' + user);
 		});
-	});
+	}
 });
 server.listen(80, e => log('server started'));
