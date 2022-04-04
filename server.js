@@ -158,7 +158,7 @@ io.of('/ops').on('connection', socket => {
 	let player = players.get(socket.id);
 
 	socket.on('get-log', () => {
-		socket.emit('chat', '[Server]: ' + logs.join('\n'))
+		socket.emit('packet', logs);
 	});
 
 	socket.on('kick', (user, reason) => {
