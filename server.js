@@ -158,10 +158,10 @@ io.on('connection', socket => {
 io.of('/ops').on('connection', socket => {
 	let player = players.get(socket.id);
 
+	socket.onAny(type => log(`Recieved ops packet: ${type}`));
 	socket.on('get-log', () => {
 		socket.emit('packet', logs);
 	});
-
 	socket.on('kick', (user, reason) => {
 		players.getByName(user).kick(reason);
 		socket.emit('Kicked ' + user);
