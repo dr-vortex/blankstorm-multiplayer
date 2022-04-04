@@ -151,6 +151,9 @@ io.on('connection', socket => {
 			rooms: socket.rooms
 		});
 	});
+	socket.on('join', nsp => {
+		socket.join(nsp);
+	});
 	socket.on('command', cmd => {
 		if(player.op > 0){
 			socket.emit('chat', `not implemented`);
