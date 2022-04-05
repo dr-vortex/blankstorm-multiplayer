@@ -19,7 +19,12 @@ https = require('https'), fs = require('fs'), ini = require('ini'),
 server = require('http').createServer((req, res) => {
 	if(req.url == '/ping'){
 		res.setHeader('Access-Control-Allow-Origin', '*');
-		res.end(JSON.stringify({currentPlayers: io.sockets.sockets.size, maxPlayers: config.max_players, status: 'online', message: config.message}));
+		res.end(JSON.stringify({
+			currentPlayers: io.sockets.sockets.size,
+			maxPlayers: config.max_players,
+			message: config.message,
+			version: version
+		}));
 	}
 }),
 io = new (require('socket.io').Server)(server, { cors : {origin: 'https://annihilation.drvortex.dev'}});
@@ -78,14 +83,16 @@ const logs = [], players = new Map();
 players.getByID = id => players.values.find(player => player.id == id);
 players.getByName = name => players.values.find(player => player.username == name);
 
+const version = 'prototype_4-5';
+
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
 
 const ops = fs.existsSync('./ops.json') ? JSON.parse(fs.readFileSync('./ops.json', 'utf-8')) : {};
 
-const whitelist = fs.existsSync('./whitelist.json') && config.whitelist ? JSON.parse(fs.readFileSync('./whitelist.json', 'utf-8')) : {};
+const whitelist = fs.existsSync('./whitelist.json') ? JSON.parse(fs.readFileSync('./whitelist.json', 'utf-8')) : {};
 
-const blacklist = fs.existsSync('./blacklist.json') && config.blacklist ? JSON.parse(fs.readFileSync('./blacklist.json', 'utf-8')) : {};
+const blacklist = fs.existsSync('./blacklist.json') ? JSON.parse(fs.readFileSync('./blacklist.json', 'utf-8')) : {};
 
 
 //Babylon stuff
@@ -124,26 +131,19 @@ io.on('connection', socket => {
 		io.emit('chat', `${player.username} left`);
 		players.delete(socket.id);
 	});
-	socket.onAny(type => {
-		log('recieved packet: ' + type);
-	});
-	socket.on('get-clients', data => {
-		let res = [];
-		players.forEach(user => {
-			res.push({
-				socket: user.socket.id,
-				id: user.id,
-				name: user.username,
-				op: user.op
-			});
-		});
-		socket.emit('packet', res);
-	});
-	socket.on('command', cmd => {
+	socket.on('command', command => {
 		if(player.op > 0){
-			socket.emit('chat', `not implemented`);
+			let parsed = command.split(' ');
+			switch(parsed[0]){
+				case 'kick':
+					players.getByName(parsed[1]).kick(parsed[2]);
+					socket.emit('chat', 'Kicked ' + parsed[1]);
+					break;
+				default:
+					socket.emit('chat', 'command does not exist');
+			}
 		}else{
-			socket.emit('chat', `not implemented`);
+			socket.emit('chat', `Can't run command: you don't have permission`);
 		}
 	});
 	socket.on('chat', data => {
@@ -152,11 +152,7 @@ io.on('connection', socket => {
 	});
 	if(player.op){
 		socket.on('get-log', () => {
-			socket.emit('packet', logs);
-		});
-		socket.on('kick', (user, reason) => {
-			players.getByName(user).kick(reason);
-			socket.emit('Kicked ' + user);
+			socket.emit('chat', logs);
 		});
 	}
 });

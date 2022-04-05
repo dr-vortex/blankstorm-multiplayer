@@ -4,12 +4,11 @@ This is a repository made for the development and testing of multiplayer for [An
 
 ## Testing
 
-You can test the app [here](https://a.drvortex.dev/mp). You will have to connect before you send a ping or packet. Ping the server to see the amount of clients and the server status (always `online`). Some packets you can send:
-- get-clients: get the other connected clients.
-- get-log: get the server logs. Server ops only!
-- chat: sends a chat message. All other clients will recieve this!
+You can test the app [here](https://a.drvortex.dev/mp). You will have to log in before you can connect. Ping the server to see some server info.
 
-At some point some of the server code may not be posted to this repo if it includes sensitive data (like database passwords).
+After connecting, simply enter a chat message and press endter or click send to send it. You can also send a raw pcket using the format `>type:content`.
+
+
 
 [Testing](https://a.drvortex.dev/mp)
 
