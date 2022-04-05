@@ -80,8 +80,8 @@ const Player = class {
 //global variables
 
 const logs = [], players = new Map();
-players.getByID = id => players.values().find(player => player.id == id);
-players.getByName = name => players.values().find(player => player.username == name);
+players.getByID = id => [...players.values()].find(player => player.id == id);
+players.getByName = name => [...players.values()].find(player => player.username == name);
 
 const version = 'prototype_4-5';
 
