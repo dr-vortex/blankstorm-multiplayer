@@ -127,7 +127,14 @@ io.use((socket, next) => {
 io.on('connection', socket => {
 	let player = players.get(socket.id);
 	socket.on('disconnect', reason => {
-		log(player.username + ' disconnected: ' + reason);
+		let message = 
+		reason == 'server namespace disconnect' ? 'Disconnected by server' :
+		reason == 'client namespace disconnect' ? 'Client disconnected' :
+		reason == 'ping timeout' ? 'Connection timed out' :
+		reason == 'transport close' ? 'Lost Connection' :
+		reason == 'transport error' ? 'Connection failed' :
+		reason;
+		log(`${player.username} left (${message})`);
 		io.emit('chat', `${player.username} left`);
 		players.delete(socket.id);
 	});
@@ -137,6 +144,7 @@ io.on('connection', socket => {
 			switch(parsed[0]){
 				case 'kick':
 					players.getByName(parsed[1]).kick(parsed[2]);
+					log(`${player.username} kicked ${parsed[1]}. Reason: ${parsed[2]}`);
 					socket.emit('chat', 'Kicked ' + parsed[1]);
 					break;
 				default:
