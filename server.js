@@ -27,7 +27,7 @@ server = require('http').createServer((req, res) => {
 		}));
 	}
 }),
-io = new (require('socket.io').Server)(server, { cors : {origin: ['https://annihilation.drvortex.dev','http://localhost']}});
+io = new (require('socket.io').Server)(server, { cors : {origin: ['https://annihilation.drvortex.dev','http://localhost','http://localhost:8080']}});
 //BABYLON = require('babylonjs');
 //global.XMLHttpRequest = require('xhr2').XMLHttpRequest;
 //Object.assign(global, BABYLON);
