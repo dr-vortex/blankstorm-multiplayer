@@ -27,7 +27,7 @@ server = require('http').createServer((req, res) => {
 		}));
 	}
 }),
-io = new (require('socket.io').Server)(server, { cors : {origin: 'https://annihilation.drvortex.dev'}});
+io = new (require('socket.io').Server)(server, { cors : {origin: 'https://annihilation.drvortex.dev, http://localhost'}});
 //BABYLON = require('babylonjs');
 //global.XMLHttpRequest = require('xhr2').XMLHttpRequest;
 //Object.assign(global, BABYLON);
@@ -83,7 +83,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-6';
+const version = 'prototype_4-7';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};

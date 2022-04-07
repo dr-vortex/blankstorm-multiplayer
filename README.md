@@ -6,7 +6,7 @@ This is a repository made for the development and testing of multiplayer for [An
 
 You can test the app [here](https://a.drvortex.dev/mp). You will have to log in before you can connect. Ping the server to see some server info.
 
-After connecting, simply enter a chat message and press endter or click send to send it. You can also send a raw pcket using the format `>type:content`.
+After connecting, simply enter a chat message and press enter or click send to send it. You can also send a raw packet using the format `>type:content`.
 
 
 
