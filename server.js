@@ -73,7 +73,8 @@ const Player = class {
 		this.socket.disconnect(true);
 	}
 	ban(message){
-		this.kick(`you have been banned from this server: ${message}`);
+		this.kick(`You have been banned from this server: ${message}`);
+		fs.writeFileSync('./blacklist.json', JSON.stringify(blacklist));
 	}
 };
 
@@ -139,14 +140,19 @@ io.on('connection', socket => {
 		io.emit('chat', `${player.username} left`);
 		players.delete(socket.id);
 	});
-	socket.on('command', command => {
+	socket.on('command', commands => {
 		if(player.op > 0){
-			let parsed = command.split(' ');
-			switch(parsed[0]){
+			let command = commands.split(' ');
+			switch(command[0]){
 				case 'kick':
-					players.getByName(parsed[1]).kick(parsed[2]);
-					log(`${player.username} kicked ${parsed[1]}. Reason: ${parsed[2]}`);
-					socket.emit('chat', 'Kicked ' + parsed[1]);
+					players.getByName(command[1]).kick(command[2]);
+					log(`${player.username} kicked ${command[1]}. Reason: ${command[2]}`);
+					socket.emit('chat', 'Kicked ' + command[1]);
+					break;
+				case 'ban':
+					players.getByName(command[1]).ban(command[2]);
+					log(`${player.username} banned ${command[1]}. Reason: ${command[2]}`);
+					socket.emit('chat', 'Banned ' + command[1]);
 					break;
 				default:
 					socket.emit('chat', 'command does not exist');

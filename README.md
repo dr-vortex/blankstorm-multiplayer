@@ -12,4 +12,6 @@ Multiplayer testing is available in Infdev 8+ by adding the mp query parameter t
 
 [Testing](https://a.drvortex.dev/mp)
 
+[Changelog](changelog.md)
+
 [Discord](https://a.drvortex.dev/discord)
