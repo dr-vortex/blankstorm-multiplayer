@@ -69,7 +69,7 @@ const Player = class {
 		players.set(socket.id, this);
 	}
 	kick(message){
-		this.socket.emit('kick', message);
+		this.socket.emit('disconnect-message', message);
 		this.socket.disconnect(true);
 	}
 	ban(message){
