@@ -8,7 +8,7 @@ You can test the app [here](https://a.drvortex.dev/mp). You will have to log in 
 
 After connecting, simply enter a chat message and press enter or click send to send it. You can also send a raw packet using the format `>type:content`.
 
-Multiplayer is available in Infdev 8+ by adding the mp query paramter to the url. For example: [https://a.drvortex.dev/play?mp=true](https://a.drvortex.dev/play?mp=true)
+Multiplayer testing is available in Infdev 8+ by adding the mp query parameter to the url. For example: [https://a.drvortex.dev/play?mp=true](https://a.drvortex.dev/play?mp=true)
 
 [Testing](https://a.drvortex.dev/mp)
 
