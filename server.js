@@ -107,6 +107,7 @@ const blacklist = fs.existsSync('./blacklist.json') ? JSON.parse(fs.readFileSync
 const commands = {
 	kick: new Command((player, reason) => {
 		players.getByName(player).kick(reason);
+		log(executor.username);
 		log(`${executor.username} kicked ${player}. Reason: ${reason}`);
 		executor.socket.emit('chat', 'Kicked ' + player);
 	}, 3),
