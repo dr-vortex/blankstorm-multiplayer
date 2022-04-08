@@ -74,7 +74,14 @@ const Player = class {
 	}
 	ban(message){
 		this.kick(`You have been banned from this server: ${message}`);
+		blacklist.push(player.id);
 		fs.writeFileSync('./blacklist.json', JSON.stringify(blacklist));
+	}
+};
+const Command = class {
+	constructor(run, opRequired){
+		this.run = run;
+		this.op = opRequired;
 	}
 };
 
@@ -84,7 +91,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-7';
+const version = 'prototype_4-8';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -94,6 +101,32 @@ const ops = fs.existsSync('./ops.json') ? JSON.parse(fs.readFileSync('./ops.json
 const whitelist = fs.existsSync('./whitelist.json') ? JSON.parse(fs.readFileSync('./whitelist.json', 'utf-8')) : {};
 
 const blacklist = fs.existsSync('./blacklist.json') ? JSON.parse(fs.readFileSync('./blacklist.json', 'utf-8')) : {};
+
+//commands
+
+const commands = {
+	kick: new Command((player, reason) => {
+		players.getByName(player).kick(reason);
+		log(`${executor.username} kicked ${player}. Reason: ${reason}`);
+		executor.socket.emit('chat', 'Kicked ' + player);
+	}, 3),
+	ban: new Command((player, reason) => {
+		players.getByName(player).ban(reason);
+		log(`${executor.username} banned ${player}. Reason: ${reason}`);
+		executor.socket.emit('chat', 'Banned ' + player);
+	}, 4)
+};
+const runCommand = (command, player) => {
+	try {
+		let parsed = command.split(' '),
+		executor = player,
+		hasRun = false,
+		result = parsed.filter(p => p).reduce((o, p, i) => o?.[p] instanceof Command && player.op >= o?.[p].op ? (hasRun = true, o?.[p].run(...parsed.slice(i + 1))) : o?.[p] instanceof Command ? new Error('You don\'t have permission to run this command') : hasRun ? o : o?.[p] ? o?.[p] : new ReferenceError('Command does not exist'), commands) ?? '';
+		player.socket.emit('chat', result);
+	} catch (err) {
+		player.socket.emit(`Command "${command}" failed: ${err}`);
+	}
+};
 
 
 //Babylon stuff
@@ -141,13 +174,14 @@ io.on('connection', socket => {
 		players.delete(socket.id);
 	});
 	socket.on('command', commands => {
+		runCommand(commands, player);
+		/*
 		if(player.op > 0){
 			let command = commands.split(' ');
 			switch(command[0]){
 				case 'kick':
 					players.getByName(command[1]).kick(command[2]);
-					log(`${player.username} kicked ${command[1]}. Reason: ${command[2]}`);
-					socket.emit('chat', 'Kicked ' + command[1]);
+					
 					break;
 				case 'ban':
 					players.getByName(command[1]).ban(command[2]);
@@ -159,7 +193,7 @@ io.on('connection', socket => {
 			}
 		}else{
 			socket.emit('chat', `Can't run command: you don't have permission`);
-		}
+		}*/
 	});
 	socket.on('chat', data => {
 		log(`[Chat] ${player.username}: ${data}`);
