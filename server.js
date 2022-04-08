@@ -117,12 +117,12 @@ const commands = {
 		executor.socket.emit('chat', 'Banned ' + player);
 	}, 4)
 };
-const runCommand = function(command, player){
-	this.executor = player;
+const runCommand = (command, player) => {
 	try {
 		let parsed = command.split(' '),
-		hasRun = false;
-		let result = parsed.filter(p => p).reduce((o, p, i) => o?.[p] instanceof Command && player.op >= o?.[p].op ? (hasRun = true, o?.[p].run(...parsed.slice(i + 1))) : o?.[p] instanceof Command ? new Error('You don\'t have permission to run this command') : hasRun ? o : o?.[p] ? o?.[p] : new ReferenceError('Command does not exist'), commands) ?? '';
+		hasRun = false,
+		executor = player,
+		result = parsed.filter(p => p).reduce((o, p, i) => o?.[p] instanceof Command && player.op >= o?.[p].op ? (hasRun = true, o?.[p].run(...parsed.slice(i + 1))) : o?.[p] instanceof Command ? new Error('You don\'t have permission to run this command') : hasRun ? o : o?.[p] ? o?.[p] : new ReferenceError('Command does not exist'), commands) ?? '';
 		player.socket.emit('chat', result);
 	} catch (err) {
 		player.socket.emit(`Command "${command}" failed: ${err}`);
