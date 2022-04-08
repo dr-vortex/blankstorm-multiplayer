@@ -123,6 +123,7 @@ const runCommand = (command, player) => {
 		hasRun = false,
 		executor = player,
 		result = parsed.filter(p => p).reduce((o, p, i) => o?.[p] instanceof Command && player.op >= o?.[p].op ? (hasRun = true, o?.[p].run(...parsed.slice(i + 1))) : o?.[p] instanceof Command ? new Error('You don\'t have permission to run this command') : hasRun ? o : o?.[p] ? o?.[p] : new ReferenceError('Command does not exist'), commands) ?? '';
+		log(executor.username);
 		player.socket.emit('chat', result);
 	} catch (err) {
 		player.socket.emit(`Command "${command}" failed: ${err}`);
