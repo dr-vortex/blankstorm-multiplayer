@@ -107,7 +107,7 @@ const blacklist = fs.existsSync('./blacklist.json') ? JSON.parse(fs.readFileSync
 const commands = {
 	kick: new Command((player, reason) => {
 		players.getByName(player).kick(reason);
-		log(this.executor.username);
+		log(executor.username);
 		log(`${executor.username} kicked ${player}. Reason: ${reason}`);
 		executor.socket.emit('chat', 'Kicked ' + player);
 	}, 3),
@@ -119,11 +119,11 @@ const commands = {
 };
 const runCommand = (command, player) => {
 	try {
+		let executor = player;
+		log(executor.username);
 		let parsed = command.split(' '),
 		hasRun = false,
-		executor = player,
 		result = parsed.filter(p => p).reduce((o, p, i) => o?.[p] instanceof Command && player.op >= o?.[p].op ? (hasRun = true, o?.[p].run(...parsed.slice(i + 1))) : o?.[p] instanceof Command ? new Error('You don\'t have permission to run this command') : hasRun ? o : o?.[p] ? o?.[p] : new ReferenceError('Command does not exist'), commands) ?? '';
-		log(executor.username);
 		player.socket.emit('chat', result);
 	} catch (err) {
 		player.socket.emit(`Command "${command}" failed: ${err}`);
