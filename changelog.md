@@ -1,5 +1,10 @@
 # Changelog
 
+### prototype 4-16
+#### April 16, 2021
+
+Updated server to use the new game name
+
 ### prototype 4-8
 #### April 8, 2021
 

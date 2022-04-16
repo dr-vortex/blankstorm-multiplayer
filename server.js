@@ -91,7 +91,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-8';
+const version = 'prototype_4-16';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -119,7 +119,7 @@ const commands = {
 };
 const runCommand = (command, player) => {
 	try {
-		let executor = player;
+		var executor = player;
 		let parsed = command.split(' '),
 		hasRun = false,
 		result = parsed.filter(p => p).reduce((o, p, i) => o?.[p] instanceof Command && player.op >= o?.[p].op ? (hasRun = true, o?.[p].run(...parsed.slice(i + 1))) : o?.[p] instanceof Command ? new Error('You don\'t have permission to run this command') : hasRun ? o : o?.[p] ? o?.[p] : new ReferenceError('Command does not exist'), commands) ?? '';
@@ -135,9 +135,9 @@ const runCommand = (command, player) => {
 //const engine = new NullEngine();
 
 //Socket handling
-const io = new (require('socket.io').Server)(server, { cors : {origin: config.allow_from_all ? '*' : 'https://annihilation.drvortex.dev'}});
+const io = new (require('socket.io').Server)(server, { cors : {origin: config.allow_from_all ? '*' : 'https://blankstorm.drvortex.dev'}});
 io.use((socket, next) => {
-	get('https://annihilation.drvortex.dev/api/user?token=' + socket.handshake.auth.token).then(res => {
+	get('https://blankstorm.drvortex.dev/api/user?token=' + socket.handshake.auth.token).then(res => {
 		if(isJSON(res) && !res.includes('ERROR') && res != 'null'){
 		
 			let user = JSON.parse(res);
