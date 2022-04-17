@@ -79,9 +79,18 @@ const Player = class {
 	}
 };
 const Command = class {
+	#command;
+	#op = 0;
 	constructor(run, opRequired){
-		this.run = run;
-		this.op = opRequired;
+		this.#command = run;
+		this.#op = opRequired;
+	}
+	run(executor, args){
+		if(executor.op >= this.#op){
+			return this.#command(...args);
+		}else{
+			return `You don't have permission to run this command`;
+		}
 	}
 };
 
@@ -91,7 +100,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-16';
+const version = 'prototype_4-17';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -119,10 +128,9 @@ const commands = {
 };
 const runCommand = (command, player) => {
 	try {
-		var executor = player;
 		let parsed = command.split(' '),
 		hasRun = false,
-		result = parsed.filter(p => p).reduce((o, p, i) => o?.[p] instanceof Command && player.op >= o?.[p].op ? (hasRun = true, o?.[p].run(...parsed.slice(i + 1))) : o?.[p] instanceof Command ? new Error('You don\'t have permission to run this command') : hasRun ? o : o?.[p] ? o?.[p] : new ReferenceError('Command does not exist'), commands) ?? '';
+		result = parsed.filter(p => p).reduce((o, p, i) => o?.[p] instanceof Command ? (hasRun = true, o?.[p].run(player, parsed.slice(i + 1))) : hasRun ? o : o?.[p] ? o?.[p] : new ReferenceError('Command does not exist'), commands) ?? '';
 		player.socket.emit('chat', result);
 	} catch (err) {
 		log(`Command "${command}" failed: ${err}`);
