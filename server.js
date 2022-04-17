@@ -87,6 +87,7 @@ const Command = class {
 	}
 	run(executor, args){
 		if(executor.op >= this.#op){
+			var executor = executor;
 			return this.#command(...args);
 		}else{
 			return `You don't have permission to run this command`;
