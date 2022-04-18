@@ -1,4 +1,4 @@
-# Annihilation Multiplayer
+# Blankstorm Multiplayer
 
 This is a repository made for the development and testing of multiplayer for [Blankstorm](https://blankstorm.drvortex.dev).
 
