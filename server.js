@@ -87,7 +87,7 @@ const Command = class {
 	}
 	run(executor, args){
 		if(executor.op >= this.#op){
-			var executor = executor;
+			this.executor = executor;
 			return this.#command(...args);
 		}else{
 			return `You don't have permission to run this command`;
@@ -117,14 +117,14 @@ const blacklist = fs.existsSync('./blacklist.json') ? JSON.parse(fs.readFileSync
 const commands = {
 	kick: new Command((player, reason) => {
 		players.getByName(player).kick(reason);
-		log(executor.username);
-		log(`${executor.username} kicked ${player}. Reason: ${reason}`);
-		executor.socket.emit('chat', 'Kicked ' + player);
+		log(this.executor.username);
+		log(`${this.executor.username} kicked ${player}. Reason: ${reason}`);
+		this.executor.socket.emit('chat', 'Kicked ' + player);
 	}, 3),
 	ban: new Command((player, reason) => {
 		players.getByName(player).ban(reason);
-		log(`${executor.username} banned ${player}. Reason: ${reason}`);
-		executor.socket.emit('chat', 'Banned ' + player);
+		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
+		this.executor.socket.emit('chat', 'Banned ' + player);
 	}, 4)
 };
 const runCommand = (command, player) => {
@@ -186,25 +186,6 @@ io.on('connection', socket => {
 	});
 	socket.on('command', commands => {
 		runCommand(commands, player);
-		/*
-		if(player.op > 0){
-			let command = commands.split(' ');
-			switch(command[0]){
-				case 'kick':
-					players.getByName(command[1]).kick(command[2]);
-					
-					break;
-				case 'ban':
-					players.getByName(command[1]).ban(command[2]);
-					log(`${player.username} banned ${command[1]}. Reason: ${command[2]}`);
-					socket.emit('chat', 'Banned ' + command[1]);
-					break;
-				default:
-					socket.emit('chat', 'command does not exist');
-			}
-		}else{
-			socket.emit('chat', `Can't run command: you don't have permission`);
-		}*/
 	});
 	socket.on('chat', data => {
 		log(`[Chat] ${player.username}: ${data}`);
