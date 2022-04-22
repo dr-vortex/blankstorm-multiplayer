@@ -11,6 +11,8 @@ c: Added the /msg and /reply commands
 
 d: Fixed /reply
 
+e: added /msg handling for users not connected
+
 ### prototype 4-17
 #### April 17, 2022
 

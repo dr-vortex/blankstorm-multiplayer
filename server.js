@@ -102,7 +102,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-22d';
+const version = 'prototype_4-22e';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -130,10 +130,14 @@ const commands = {
 		log(`${this.executor.username} logged ${message.join(' ')}`);
 	}, 1),
 	msg: new Command(function(player, ...message){
-		players.getByName(player).socket.emit(`[${this.executor.username} -> me] ${message.join(' ')}`);
-		log(`[${this.executor.username} -> ${player}] ${message.join(' ')}`);
-		players.getByName(player).lastMessager = this.executor;
-		return `[me -> ${this.executor.username}] ${message.join(' ')}`;
+		if(players.getByName(player)){
+			players.getByName(player).socket.emit(`[${this.executor.username} -> me] ${message.join(' ')}`);
+			log(`[${this.executor.username} -> ${player}] ${message.join(' ')}`);
+			players.getByName(player).lastMessager = this.executor;
+			return `[me -> ${this.executor.username}] ${message.join(' ')}`;
+		}else{
+			return 'That user is not online'
+		}
 	}, 0),
 	reply: new Command(function(...message){
 		return this.executor.lastMessager ? 
