@@ -13,6 +13,8 @@ d: Fixed /reply
 
 e: added /msg handling for users not connected
 
+f: changed ping timings
+
 ### prototype 4-17
 #### April 17, 2022
 

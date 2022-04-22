@@ -102,7 +102,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-22e';
+const version = 'prototype_4-22f';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -163,7 +163,11 @@ const runCommand = (command, player) => {
 //const engine = new NullEngine();
 
 //Socket handling
-const io = new (require('socket.io').Server)(server, { cors : {origin: config.allow_from_all ? '*' : 'https://blankstorm.drvortex.dev'}});
+const io = new (require('socket.io').Server)(server, {
+	pingInterval: 1000,
+	pingTimeout: 10000,
+	cors : {origin: config.allow_from_all ? '*' : 'https://blankstorm.drvortex.dev'}
+});
 io.use((socket, next) => {
 	get('https://blankstorm.drvortex.dev/api/user?token=' + socket.handshake.auth.token).then(res => {
 		if(isJSON(res) && !res.includes('ERROR') && res != 'null'){
