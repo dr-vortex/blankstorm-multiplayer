@@ -64,7 +64,8 @@ const Player = class {
 			id: info.id,
 			username: info.username,
 			op: ops[info.id] ? ops[info.id].level : 0,
-			socket: socket
+			socket: socket,
+			lastMessager: null
 		});
 		players.set(socket.id, this);
 	}
@@ -118,16 +119,28 @@ const commands = {
 	kick: new Command(function(player, reason){
 		players.getByName(player).kick(reason);
 		log(`${this.executor.username} kicked ${player}. Reason: ${reason}`);
-		this.executor.socket.emit('chat', 'Kicked ' + player);
+		return 'Kicked ' + player;
 	}, 3),
 	ban: new Command(function(player, reason){
 		players.getByName(player).ban(reason);
 		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
-		this.executor.socket.emit('chat', 'Banned ' + player);
+		return 'Banned ' + player;
 	}, 4),
 	log: new Command(function(...message){
 		log(`${this.executor.username} logged ${message.join(' ')}`);
-	}, 1)
+	}, 1),
+	msg: new Command(function(player, ...message){
+		players.getByName(player).socket.emit(`[${this.executor.username} -> me] ${message.join(' ')}`);
+		log(`[${this.executor.username} -> ${player}] ${message.join(' ')}`);
+		players.getByName(player).lastMessager = this.executor;
+		return `[me -> ${this.executor.username}] ${message.join(' ')}`;
+	}, 0),
+	reply: new Command(function(...message){
+		return this.executor.lastMessager ? 
+		commands.msg.run(this.executor.lastMessager.username, ...message)
+		: 'No one messaged you yet =('
+		
+	}, 0)
 };
 const runCommand = (command, player) => {
 	try {

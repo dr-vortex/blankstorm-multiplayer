@@ -1,14 +1,13 @@
 # Changelog
 
-### prototype 4-22b
-#### April 22, 2022
-
-Added the /log command
-
 ### prototype 4-22
 #### April 22, 2022
 
 Fixed executor and a type in the changelog
+
+b: Added the /log command
+
+c: Added the /msg and /reply commands
 
 ### prototype 4-17
 #### April 17, 2022
