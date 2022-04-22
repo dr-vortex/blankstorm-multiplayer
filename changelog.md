@@ -1,5 +1,10 @@
 # Changelog
 
+### prototype 4-22b
+#### April 22, 2022
+
+Added the /log command
+
 ### prototype 4-22
 #### April 22, 2022
 

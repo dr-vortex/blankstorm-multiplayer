@@ -101,7 +101,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-22';
+const version = 'prototype_4-22b';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -117,7 +117,6 @@ const blacklist = fs.existsSync('./blacklist.json') ? JSON.parse(fs.readFileSync
 const commands = {
 	kick: new Command(function(player, reason){
 		players.getByName(player).kick(reason);
-		log(this.executor.username);
 		log(`${this.executor.username} kicked ${player}. Reason: ${reason}`);
 		this.executor.socket.emit('chat', 'Kicked ' + player);
 	}, 3),
@@ -125,7 +124,10 @@ const commands = {
 		players.getByName(player).ban(reason);
 		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
 		this.executor.socket.emit('chat', 'Banned ' + player);
-	}, 4)
+	}, 4),
+	log: new Command(function(message){
+		log(`${this.executor.username} logged ${message}`);
+	}, 1)
 };
 const runCommand = (command, player) => {
 	try {
