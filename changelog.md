@@ -9,6 +9,8 @@ b: Added the /log command
 
 c: Added the /msg and /reply commands
 
+d: Fixed /reply
+
 ### prototype 4-17
 #### April 17, 2022
 

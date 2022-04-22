@@ -102,7 +102,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-22c';
+const version = 'prototype_4-22d';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -137,7 +137,7 @@ const commands = {
 	}, 0),
 	reply: new Command(function(...message){
 		return this.executor.lastMessager ? 
-		commands.msg.run(this.executor.lastMessager.username, ...message)
+		commands.msg.run(this.executor, [this.executor.lastMessager.username, ...message])
 		: 'No one messaged you yet =('
 		
 	}, 0)
