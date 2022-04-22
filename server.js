@@ -125,8 +125,8 @@ const commands = {
 		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
 		this.executor.socket.emit('chat', 'Banned ' + player);
 	}, 4),
-	log: new Command(function(message){
-		log(`${this.executor.username} logged ${message}`);
+	log: new Command(function(...message){
+		log(`${this.executor.username} logged ${message.join(' ')}`);
 	}, 1)
 };
 const runCommand = (command, player) => {
