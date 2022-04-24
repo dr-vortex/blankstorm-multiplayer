@@ -3,7 +3,9 @@
 ### prototype 4-24
 #### April 24, 2022
 
-Removed get-log packet type, added rate limiting, and added verbose logging option
+a: Removed get-log packet type, added rate limiting, and added verbose logging option
+
+b: Added a timestamp/ping property to the ping response
 
 ### prototype 4-22
 #### April 22, 2022
