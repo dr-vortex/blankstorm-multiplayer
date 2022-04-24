@@ -65,6 +65,7 @@ const Player = class {
 			username: info.username,
 			op: ops[info.id] ? ops[info.id].level : 0,
 			socket: socket,
+			sentPackets: 0,
 			lastMessager: null
 		});
 		players.set(socket.id, this);
@@ -102,7 +103,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-22f';
+const version = 'prototype_4-24';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -195,6 +196,9 @@ io.use((socket, next) => {
 });
 io.on('connection', socket => {
 	let player = players.get(socket.id);
+	socket.onAny(eventName => {
+		player.sentPackets++;
+	});
 	socket.on('disconnect', reason => {
 		let message = 
 		reason == 'server namespace disconnect' ? 'Disconnected by server' :
@@ -214,10 +218,15 @@ io.on('connection', socket => {
 		log(`[Chat] ${player.username}: ${data}`);
 		io.emit('chat', `${player.username}: ${data}`);
 	});
-	if(player.op){
-		socket.on('get-log', () => {
-			socket.emit('chat', logs);
-		});
-	}
 });
+
+setInterval(e => {
+	players.forEach(player => {
+		if(player.sentPackets > 50){
+			player.kick('Sending to many packets');
+		}
+		player.sentPackets = 0;
+	});
+}, 1000);
+
 server.listen(80, e => log('server started'));

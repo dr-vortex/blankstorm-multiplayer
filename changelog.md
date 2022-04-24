@@ -1,9 +1,14 @@
 # Changelog
 
+### prototype 4-24
+#### April 24, 2022
+
+Removed get-log packet type, added rate limiting, and added verbose logging option
+
 ### prototype 4-22
 #### April 22, 2022
 
-Fixed executor and a type in the changelog
+a: Fixed executor and a type in the changelog
 
 b: Added the /log command
 
