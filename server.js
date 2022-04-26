@@ -1,16 +1,22 @@
 //plugins
-Object.prototype.getByString = function(path, seperator){
-	return path
-	.split(seperator || /[\.\[\]\'\"]/)
-	.filter(p => p)
-	.reduce((o, p) => o ? o[p] : null, this)
-}
-Object.prototype.setByString = function (path, value, seperator) {
-	return path
-	.split(seperator || /[\.\[\]\'\"]/)
-	.filter(p => p)
-	.reduce((o, p, i) => o[p] = path.split(seperator || /[\.\[\]\'\"]/).filter(p => p).length === ++i ? value : (o[p] || {}), this);
-}
+Object.defineProperties(Object.prototype, {
+	getByString: {
+		value: function(path, seperator){
+			return path
+			.split(seperator || /[\.\[\]\'\"]/)
+			.filter(p => p)
+			.reduce((o, p) => o ? o[p] : null, this)
+		}
+	},
+	setByString: {
+		value: function(path, value, seperator){
+			return path
+			.split(seperator || /[\.\[\]\'\"]/)
+			.filter(p => p)
+			.reduce((o, p, i) => o[p] = path.split(seperator || /[\.\[\]\'\"]/).filter(p => p).length === ++i ? value : (o[p] || {}), this);
+		}
+	}
+});
 
 
 //modules
@@ -23,8 +29,7 @@ server = http.createServer((req, res) => {
 			currentPlayers: io.sockets.sockets.size,
 			maxPlayers: config.max_players,
 			message: config.message,
-			version: version,
-			time: Date.now()
+			version: version
 		}));
 	}
 });
@@ -104,7 +109,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-24b';
+const version = 'prototype_4-25';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};

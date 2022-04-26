@@ -1,5 +1,10 @@
 # Changelog
 
+### prototype 4-25
+#### April 25, 2022
+
+The server no longer sends the current server time to the client
+
 ### prototype 4-24
 #### April 24, 2022
 
