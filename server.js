@@ -129,9 +129,8 @@ const commands = {
 		return 'Kicked ' + player;
 	}, 3),
 	ban: new Command(function(player, reason){
-		console.log('banning ' + player);
 		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
-		players.getByName(player).ban(reason);
+		setTimeout(e=>players.getByName(player).ban(reason),25);
 		return 'Banned ' + player;
 	}, 4),
 	log: new Command(function(...message){
