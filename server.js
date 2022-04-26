@@ -84,7 +84,6 @@ const Player = class {
 		this.kick(`You have been banned from this server: ${message}`);
 		blacklist.push(this.id);
 		fs.writeFileSync('./blacklist.json', JSON.stringify(blacklist));
-		log('DEBUG: blacklist = ' + JSON.stringify(blacklist));
 	}
 };
 const Command = class {
