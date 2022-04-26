@@ -34,10 +34,6 @@ server = http.createServer((req, res) => {
 	}
 });
 
-//BABYLON = require('babylonjs');
-//global.XMLHttpRequest = require('xhr2').XMLHttpRequest;
-//Object.assign(global, BABYLON);
-
 //global functions
 
 const get = url => new Promise(resolve => {
@@ -64,7 +60,19 @@ log = message => {
 	console.log(message);
 };
 
+const API = {
+	url: 'https://blankstorm.drvortex.dev/api/',
+	user: (name, value) => get(`${API.url}user?${name}=${value}`)
+}
+
+//BABYLON = require('babylonjs');
+//global.XMLHttpRequest = require('xhr2').XMLHttpRequest;
+//Object.assign(global, BABYLON);
+
 const Player = class {
+	static getID(name){
+		return API.user('username', name).then(info => JSON.parse(info).id);
+	}
 	constructor(info, socket){
 		Object.assign(this, {
 			id: info.id,
@@ -109,7 +117,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-25';
+const version = 'prototype_4-26';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -132,6 +140,12 @@ const commands = {
 		players.getByName(player).ban(reason);
 		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
 		return 'Banned ' + player;
+	}, 4),
+	unban: new Command(function(player){
+		Player.getID(player).then(id => {
+			blacklist.splice(blacklist.indexOf(id), 1);
+			fs.writeFileSync('./blacklist.json', JSON.stringify(blacklist));
+		});
 	}, 4),
 	log: new Command(function(...message){
 		log(`${this.executor.username} logged ${message.join(' ')}`);
@@ -176,7 +190,7 @@ const io = new (require('socket.io').Server)(server, {
 	cors : {origin: config.allow_from_all ? '*' : 'https://blankstorm.drvortex.dev'}
 });
 io.use((socket, next) => {
-	get('https://blankstorm.drvortex.dev/api/user?token=' + socket.handshake.auth.token).then(res => {
+	API.user('token', socket.handshake.auth.token).then(res => {
 		if(isJSON(res) && !res.includes('ERROR') && res != 'null'){
 		
 			let user = JSON.parse(res);

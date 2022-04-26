@@ -1,5 +1,10 @@
 # Changelog
 
+### prototype 4-26
+#### April 26, 2022
+
+Fixed ban command, added unban command, and how data is fetched.
+
 ### prototype 4-25
 #### April 25, 2022
 
