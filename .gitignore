@@ -1,3 +1,6 @@
 .htaccess
 server.log
 tmp
+public
+.gitignore
+.well-known

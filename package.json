@@ -17,10 +17,10 @@
   },
   "homepage": "https://github.com/dr-vortex/annihilation-multiplayer#readme",
   "dependencies": {
-    "babylonjs": "^4.2.1",
+    "babylonjs": "^4.2.2",
     "https": "^1.0.0",
     "ini": "^2.0.0",
-    "socket.io": "^4.4.1",
+    "socket.io": "^4.5.0",
     "xhr2": "^0.2.1"
   }
 }
