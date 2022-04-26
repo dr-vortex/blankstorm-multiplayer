@@ -109,7 +109,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-25';
+const version = 'prototype_4-26';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -129,6 +129,7 @@ const commands = {
 		return 'Kicked ' + player;
 	}, 3),
 	ban: new Command(function(player, reason){
+		console.log('good hete');
 		players.getByName(player).ban(reason);
 		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
 		return 'Banned ' + player;
