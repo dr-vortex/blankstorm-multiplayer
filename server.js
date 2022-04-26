@@ -129,8 +129,8 @@ const commands = {
 		return 'Kicked ' + player;
 	}, 3),
 	ban: new Command(function(player, reason){
-		console.log('good hete');
 		players.getByName(player).ban(reason);
+		console.log('good here')
 		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
 		return 'Banned ' + player;
 	}, 4),
@@ -162,7 +162,7 @@ const runCommand = (command, player) => {
 		player.socket.emit('chat', result);
 	} catch (err) {
 		log(`Command "${command}" failed: ${err}`);
-		player.socket.emit('chat', `Command "${command}" failed: ${err}`);
+		player.socket.emit('chat', `Command "${command}" failed: ${err.stack}`);
 	}
 };
 
