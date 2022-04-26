@@ -84,6 +84,7 @@ const Player = class {
 		this.kick(`You have been banned from this server: ${message}`);
 		blacklist.push(this.id);
 		fs.writeFileSync('./blacklist.json', JSON.stringify(blacklist));
+		log('DEBUG: blacklist = ' + JSON.stringify(blacklist));
 	}
 };
 const Command = class {
@@ -129,8 +130,8 @@ const commands = {
 		return 'Kicked ' + player;
 	}, 3),
 	ban: new Command(function(player, reason){
-		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
 		players.getByName(player).ban(reason);
+		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
 		return 'Banned ' + player;
 	}, 4),
 	log: new Command(function(...message){
