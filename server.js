@@ -130,9 +130,8 @@ const commands = {
 	}, 3),
 	ban: new Command(function(player, reason){
 		console.log('banning ' + player);
-		players.getByName(player).ban(reason);
-		console.log('good here');
 		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
+		players.getByName(player).ban(reason);
 		return 'Banned ' + player;
 	}, 4),
 	log: new Command(function(...message){
