@@ -117,7 +117,7 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-26';
+const version = 'prototype_4-28';
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -131,14 +131,14 @@ const blacklist = fs.existsSync('./blacklist.json') ? JSON.parse(fs.readFileSync
 //commands
 
 const commands = {
-	kick: new Command(function(player, reason){
+	kick: new Command(function(player, ...reason){
 		players.getByName(player).kick(reason);
-		log(`${this.executor.username} kicked ${player}. Reason: ${reason}`);
+		log(`${this.executor.username} kicked ${player}. Reason: ${reason.join(' ')}`);
 		return 'Kicked ' + player;
 	}, 3),
-	ban: new Command(function(player, reason){
+	ban: new Command(function(player, ...reason){
 		players.getByName(player).ban(reason);
-		log(`${this.executor.username} banned ${player}. Reason: ${reason}`);
+		log(`${this.executor.username} banned ${player}. Reason: ${reason.join(' ')}`);
 		return 'Banned ' + player;
 	}, 4),
 	unban: new Command(function(player){
@@ -151,7 +151,7 @@ const commands = {
 		log(`${this.executor.username} logged ${message.join(' ')}`);
 	}, 1),
 	msg: new Command(function(player, ...message){
-		if(players.getByName(player)){
+		if(players.getByName(player) instanceof Player){
 			players.getByName(player).socket.emit(`[${this.executor.username} -> me] ${message.join(' ')}`);
 			log(`[${this.executor.username} -> ${player}] ${message.join(' ')}`);
 			players.getByName(player).lastMessager = this.executor;

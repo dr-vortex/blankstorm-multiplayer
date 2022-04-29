@@ -1,5 +1,10 @@
 # Changelog
 
+### prototype 4-28
+#### April 28, 2022
+
+Fixed /ban and /kick reason terminating after the first space and fixed /msg and /reply not working
+
 ### prototype 4-26
 #### April 26, 2022
 
