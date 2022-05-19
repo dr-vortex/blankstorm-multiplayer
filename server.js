@@ -25,7 +25,7 @@ const https = require('https'), fs = require('fs'), ini = require('ini');
 //pings
 const server = require('http').createServer((req, res) => {
 	switch(req.url){
-		case 'ping':
+		case '/ping':
 			res.setHeader('Access-Control-Allow-Origin', '*');
 			res.end(JSON.stringify({
 				currentPlayers: io.sockets.sockets.size,
@@ -259,4 +259,4 @@ setInterval(e => {
 	});
 }, 1000);
 
-server.listen(1123, e => log('server started'));
+server.listen(config.port ?? 1123, e => log('server started'));

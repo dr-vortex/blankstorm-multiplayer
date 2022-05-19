@@ -3,7 +3,9 @@
 ### prototype 5-18
 #### May 18, 2022
 
-Add support for version metadata, tab/player list, and added a check for already connected players
+a: Added support for version metadata, tab/player list, and added a check for already connected players
+
+b: Fixed a ping issue and added support for custom port
 
 ### prototype 4-28
 #### April 28, 2022
