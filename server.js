@@ -20,17 +20,20 @@ Object.defineProperties(Object.prototype, {
 
 
 //modules
-const
-https = require('https'), http = require('http'), fs = require('fs'), ini = require('ini'), 
-server = http.createServer((req, res) => {
-	if(req.url == '/ping'){
-		res.setHeader('Access-Control-Allow-Origin', '*');
-		res.end(JSON.stringify({
-			currentPlayers: io.sockets.sockets.size,
-			maxPlayers: config.max_players,
-			message: config.message,
-			version: version
-		}));
+const https = require('https'), fs = require('fs'), ini = require('ini');
+
+//pings
+const server = require('http').createServer((req, res) => {
+	switch(req.url){
+		case 'ping':
+			res.setHeader('Access-Control-Allow-Origin', '*');
+			res.end(JSON.stringify({
+				currentPlayers: io.sockets.sockets.size,
+				maxPlayers: config.max_players,
+				message: config.message,
+				version
+			}));
+		break;
 	}
 });
 
@@ -73,14 +76,14 @@ const Player = class {
 	static getID(name){
 		return API.user('username', name).then(info => JSON.parse(info).id);
 	}
+	sentPackets = 0;
+	lastMessager = null;
 	constructor(info, socket){
 		Object.assign(this, {
 			id: info.id,
 			username: info.username,
 			op: ops[info.id] ? ops[info.id].level : 0,
-			socket: socket,
-			sentPackets: 0,
-			lastMessager: null
+			socket
 		});
 		players.set(socket.id, this);
 	}
@@ -117,7 +120,11 @@ const logs = [], players = new Map();
 players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
-const version = 'prototype_4-28';
+const version = {
+	name: 'prototype_5-18',
+	text: 'Prototype 5-18',
+	group: 'prototype'
+};
 
 //load config and settings and things
 const config = fs.existsSync('./config.ini') ? ini.parse(fs.readFileSync('./config.ini', 'utf-8')) : {};
@@ -203,6 +210,8 @@ io.use((socket, next) => {
 				next(new Error('Connection refused: your account is disabled'));
 			}else if(io.sockets.sockets.size >= config.max_players && !(ops[user.id] && ops[user.id].bypassLimit)){
 				next(new Error('Connection refused: server full'));
+			}else if(players.getByID(user.id)){
+				next(new Error('Connection refused: already connected'));
 			}else{
 				let player = new Player(user, socket);
 				log(`${user.username} connected with socket id ${socket.id}`);
@@ -216,6 +225,7 @@ io.use((socket, next) => {
 });
 io.on('connection', socket => {
 	let player = players.get(socket.id);
+	io.emit('playerlist', [...players.values()].slice(0, 25).map(data => data.username));
 	socket.onAny(eventName => {
 		player.sentPackets++;
 	});

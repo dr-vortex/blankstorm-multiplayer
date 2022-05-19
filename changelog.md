@@ -1,5 +1,10 @@
 # Changelog
 
+### prototype 5-18
+#### May 18, 2022
+
+Add support for version metadata, tab/player list, and added a check for already connected players
+
 ### prototype 4-28
 #### April 28, 2022
 
