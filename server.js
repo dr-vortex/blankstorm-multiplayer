@@ -121,8 +121,8 @@ players.getByID = id => [...players.values()].find(player => player.id == id);
 players.getByName = name => [...players.values()].find(player => player.username == name);
 
 const version = {
-	name: 'prototype_5-18',
-	text: 'Prototype 5-18',
+	name: 'prototype_5-19',
+	text: 'Prototype 5-19',
 	group: 'prototype'
 };
 
@@ -240,6 +240,7 @@ io.on('connection', socket => {
 		log(`${player.username} left (${message})`);
 		io.emit('chat', `${player.username} left`);
 		players.delete(socket.id);
+		io.emit('playerlist', [...players.values()].slice(0, 25).map(data => data.username));
 	});
 	socket.on('command', commands => {
 		runCommand(commands, player);

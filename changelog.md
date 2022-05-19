@@ -1,5 +1,10 @@
 # Changelog
 
+### prototype 5-19
+#### May 19, 2022
+
+Tab list updates are sent on client disconnects
+
 ### prototype 5-18
 #### May 18, 2022
 
